@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "pUCsS91H0vtR8850TpTkvjekFVMAfDGobiIst867rzs=",
+  "Source": "NadeVault.Api",
+  "BasePath": "_content/NadeVault.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

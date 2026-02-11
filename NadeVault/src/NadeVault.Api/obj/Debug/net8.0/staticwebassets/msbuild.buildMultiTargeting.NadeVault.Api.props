@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/NadeVault.Api.props" />
+</Project>
