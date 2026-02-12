@@ -1,19 +1,27 @@
-# Compilados e Binários (O MAIS IMPORTANTE)
-# Nunca comite isso. Eles são gerados pelo build.
-[Bb]in/
-[Oo]bj/
+# Environment
+.env
 
-# Configurações de IDE e Usuário
-.vs/
+# Database volumes
+postgres_data/
+minio_data/
+
+# Go build
+/bin/
+main
+server
+*.exe
+*.test
+*.out
+coverage.out
+
+# Logs
+*.log
+logs/
+
+# IDE
 .vscode/
-*.user
-*.suo
+.idea/
 
-# Arquivos de Sistema (Lixo do SO)
+# OS
 .DS_Store
 Thumbs.db
-
-# Variáveis de Ambiente e Segredos (SEGURANÇA)
-# Nunca suba chaves de API ou senhas
-.env
-appsettings.Development.json

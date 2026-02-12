@@ -1,0 +1,11 @@
+version: 2
+
+sql:
+  - engine: postgresql
+    schema: ../../infra/init/setup.sql
+    queries: queries.sql
+    gen:
+      go:
+        package: nadevault
+        out: ../internal/db
+        sql_package: pgx/v5
