@@ -1,15 +1,27 @@
+# Environment
 .env
 
+# Database volumes
 postgres_data/
 minio_data/
-init/   # (Opcional: se o init tiver senhas, ignore. Se for só SQL genérico, pode subir)
 
+# Go build
 /bin/
 main
 server
 *.exe
 *.test
+*.out
+coverage.out
 
+# Logs
+*.log
+logs/
 
+# IDE
 .vscode/
 .idea/
+
+# OS
+.DS_Store
+Thumbs.db
