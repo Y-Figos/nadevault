@@ -21,11 +21,11 @@ type Nade struct {
 	Name        string
 	Description string
 	MapID       int16
-	NadeType    interface{}
-	CommonSide  interface{}
+	NadeType    string
+	CommonSide  string
 	FromCallout string
 	ToCallout   string
-	MouseClick  interface{}
+	MouseClick  string
 	IsJumping   bool
 	IsRunning   bool
 	IsWalking   bool

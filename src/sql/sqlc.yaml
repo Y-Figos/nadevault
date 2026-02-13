@@ -9,3 +9,10 @@ sql:
         package: nadevault
         out: ../internal/db
         sql_package: pgx/v5
+        overrides:
+        - db_type: "nade_type"
+          go_type: "string"
+        - db_type: "side_type"
+          go_type: "string"
+        - db_type: "mouse_click"
+          go_type: "string"

@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type MouseClick string
 
 const (
@@ -29,7 +31,8 @@ type Nade struct {
 	ID         int64    `json:"id,omitempty"`
 	Name       string   `json:"name,omitempty"`
 	Desc       string   `json:"desc,omitempty"`
-	MapId      int16    `json:"map_id,omitempty"`
+	MapName    string   `json:"map_name,omitempty"`
+	MapID      int16    `json:"map_id,omitempty"`
 	Type       NadeType `json:"type,omitempty"`
 	CommonSide Side     `json:"common_side,omitempty"`
 	From       string   `json:"from,omitempty"`
@@ -41,10 +44,41 @@ type Nade struct {
 	IsWalking  bool       `json:"is_walking"`
 	//Images urls stored in S3/Minio
 	Images NadeImages `json:"images,omitempty"`
+	// Metadata
+	CreatedBy string    `json:"created_by,omitempty"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	IsPublic  bool      `json:"is_public"`
 }
 
 type NadeImages struct {
 	StandingPos []string `json:"standing_pos,omitempty"`
 	AimAt       []string `json:"aim_at,omitempty"`
 	ReleaseAt   []string `json:"release_at,omitempty"`
+}
+
+func NewNadeImages(standingPos []string, aimAt []string, releaseAt []string) NadeImages {
+	return NadeImages{
+		StandingPos: standingPos,
+		AimAt:       aimAt,
+		ReleaseAt:   releaseAt,
+	}
+}
+
+func NewNade(ID int64, name string, desc string, mapId int16, nadeType NadeType, commonSide Side, from string, to string, mouseClick MouseClick, isJumping bool, isRunning bool, isWalking bool, images NadeImages) *Nade {
+	return &Nade{
+		ID:         ID,
+		Name:       name,
+		Desc:       desc,
+		MapID:      mapId,
+		Type:       nadeType,
+		CommonSide: commonSide,
+		From:       from,
+		To:         to,
+		MouseClick: mouseClick,
+		IsJumping:  isJumping,
+		IsRunning:  isRunning,
+		IsWalking:  isWalking,
+		Images:     images,
+	}
 }

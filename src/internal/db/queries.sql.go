@@ -11,9 +11,34 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const getNade = `-- name: GetNade :one
+const getMapByCode = `-- name: GetMapByCode :one
 SELECT
 id,
+code,
+display_name,
+is_active,
+created_at
+FROM cs_maps
+WHERE code = $1
+`
+
+func (q *Queries) GetMapByCode(ctx context.Context, code string) (CsMap, error) {
+	row := q.db.QueryRow(ctx, getMapByCode, code)
+	var i CsMap
+	err := row.Scan(
+		&i.ID,
+		&i.Code,
+		&i.DisplayName,
+		&i.IsActive,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getNade = `-- name: GetNade :one
+SELECT
+nades.id,
+cs_maps.display_name AS map_display_name,
 name,
 description,
 map_id,
@@ -28,30 +53,32 @@ is_walking,
 images,
 is_public,
 created_by,
-created_at,
+nades.created_at,
 updated_at
 FROM nades
-WHERE id = $1
+JOIN cs_maps ON nades.map_id = cs_maps.id
+WHERE nades.id = $1
 `
 
 type GetNadeRow struct {
-	ID          int64
-	Name        string
-	Description string
-	MapID       int16
-	NadeType    interface{}
-	CommonSide  interface{}
-	FromCallout string
-	ToCallout   string
-	MouseClick  interface{}
-	IsJumping   bool
-	IsRunning   bool
-	IsWalking   bool
-	Images      []byte
-	IsPublic    bool
-	CreatedBy   pgtype.Text
-	CreatedAt   pgtype.Timestamptz
-	UpdatedAt   pgtype.Timestamptz
+	ID             int64
+	MapDisplayName string
+	Name           string
+	Description    string
+	MapID          int16
+	NadeType       string
+	CommonSide     string
+	FromCallout    string
+	ToCallout      string
+	MouseClick     string
+	IsJumping      bool
+	IsRunning      bool
+	IsWalking      bool
+	Images         []byte
+	IsPublic       bool
+	CreatedBy      pgtype.Text
+	CreatedAt      pgtype.Timestamptz
+	UpdatedAt      pgtype.Timestamptz
 }
 
 func (q *Queries) GetNade(ctx context.Context, id int64) (GetNadeRow, error) {
@@ -59,6 +86,7 @@ func (q *Queries) GetNade(ctx context.Context, id int64) (GetNadeRow, error) {
 	var i GetNadeRow
 	err := row.Scan(
 		&i.ID,
+		&i.MapDisplayName,
 		&i.Name,
 		&i.Description,
 		&i.MapID,
@@ -77,4 +105,97 @@ func (q *Queries) GetNade(ctx context.Context, id int64) (GetNadeRow, error) {
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const listNadesByMapID = `-- name: ListNadesByMapID :many
+SELECT
+nades.id,
+cs_maps.display_name AS map_display_name,
+name,
+description,
+map_id,
+nade_type,
+common_side,
+from_callout,
+to_callout,
+mouse_click,
+is_jumping,
+is_running,
+is_walking,
+images,
+is_public,
+created_by,
+nades.created_at,
+updated_at
+FROM nades
+JOIN cs_maps ON nades.map_id = cs_maps.id
+WHERE map_id = $1
+ORDER BY nades.created_at DESC
+LIMIT $2 OFFSET $3
+`
+
+type ListNadesByMapIDParams struct {
+	MapID  int16
+	Limit  int32
+	Offset int32
+}
+
+type ListNadesByMapIDRow struct {
+	ID             int64
+	MapDisplayName string
+	Name           string
+	Description    string
+	MapID          int16
+	NadeType       string
+	CommonSide     string
+	FromCallout    string
+	ToCallout      string
+	MouseClick     string
+	IsJumping      bool
+	IsRunning      bool
+	IsWalking      bool
+	Images         []byte
+	IsPublic       bool
+	CreatedBy      pgtype.Text
+	CreatedAt      pgtype.Timestamptz
+	UpdatedAt      pgtype.Timestamptz
+}
+
+func (q *Queries) ListNadesByMapID(ctx context.Context, arg ListNadesByMapIDParams) ([]ListNadesByMapIDRow, error) {
+	rows, err := q.db.Query(ctx, listNadesByMapID, arg.MapID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListNadesByMapIDRow
+	for rows.Next() {
+		var i ListNadesByMapIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.MapDisplayName,
+			&i.Name,
+			&i.Description,
+			&i.MapID,
+			&i.NadeType,
+			&i.CommonSide,
+			&i.FromCallout,
+			&i.ToCallout,
+			&i.MouseClick,
+			&i.IsJumping,
+			&i.IsRunning,
+			&i.IsWalking,
+			&i.Images,
+			&i.IsPublic,
+			&i.CreatedBy,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
