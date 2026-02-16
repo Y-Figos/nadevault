@@ -11,6 +11,7 @@ import (
 
 	nadevault "github.com/Y-Figos/nadevault/internal/db"
 	internalhttp "github.com/Y-Figos/nadevault/internal/http"
+	"github.com/Y-Figos/nadevault/internal/http/web"
 	"github.com/Y-Figos/nadevault/internal/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
@@ -32,8 +33,12 @@ func main() {
 	queries := nadevault.New(pool)
 
 	repo := repository.NewPostgresNadeRepository(queries)
-
-	router := internalhttp.NewRouter(repo)
+	renderer, err := web.NewRenderer("internal/http/web/templates/*.html")
+	if err != nil{
+		log.Printf("Failed to Render Glob: %v", err)
+		panic(err)
+	}
+	router := internalhttp.NewRouter(repo, renderer)
 
 	srv := &http.Server{
 		Addr:    ":8080",

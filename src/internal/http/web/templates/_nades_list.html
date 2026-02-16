@@ -1,0 +1,13 @@
+{{ define "_nade_list" }}
+{{range .Nades}}
+        <div class="nade-card">
+            <h3>{{.Name}}</h3>
+            <p>Type: {{.Type}}</p>
+            <p>Side: {{.CommonSide}}</p>
+            <p>From: {{.From}}</p>
+            <p>To: {{.To}}</p>
+        </div>
+        {{else}}
+        <p>No nades found for this map.</p>
+ {{end}}
+{{ end }}

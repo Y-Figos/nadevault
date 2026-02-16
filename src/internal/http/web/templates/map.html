@@ -1,0 +1,11 @@
+{{ define "content" }}
+<div
+id = "nades"
+hx-get="/maps/{{.Code}}/nades"
+class = "map-container"
+hx-trigger="load"
+>
+<h1>{{.DisplayName}}</h1>
+loading...
+</div>
+{{ end }}

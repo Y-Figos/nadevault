@@ -4,13 +4,15 @@ import (
 	"time"
 
 	"github.com/Y-Figos/nadevault/internal/http/handlers"
+	"github.com/Y-Figos/nadevault/internal/http/web"
 	"github.com/Y-Figos/nadevault/internal/repository"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func NewRouter(repo repository.NadeDataRepository) *chi.Mux {
-	handler := handlers.NewNadeHandler(repo)
+func NewRouter(repo repository.NadeDataRepository, renderer *web.Renderer) *chi.Mux {
+	nadeHandler := handlers.NewNadeHandler(repo)
+	templateRenderer := handlers.NewTemplateRenderer(repo, renderer)
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -22,13 +24,15 @@ func NewRouter(repo repository.NadeDataRepository) *chi.Mux {
 
 	r.Route("/api", func(r chi.Router) {
 		r.Get("/health", handlers.HealthHandler)
-		r.Get("/nades/{nadeID}", handler.GetNadeByID)
+		r.Get("/nades/{nadeID}", nadeHandler.GetNadeByID)
 		r.Route("/maps", func(r chi.Router) {
-			r.Get("/{mapCode}/nades", handler.ListNadesByMapID)
+			r.Get("/{mapCode}/nades", nadeHandler.ListNadesByMapID)
 		})
-		r.Post("/nades", handler.AddNade)
+		r.Post("/nades", nadeHandler.AddNade)
 
 	})
+	r.Get("/maps/{mapCode}", templateRenderer.RenderMapPage)
+	r.Get("/maps/{mapCode}/nades", templateRenderer.RenderNadeListPartial)
 
 	return r
 }

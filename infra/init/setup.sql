@@ -1,9 +1,3 @@
--- schema.sql (PostgreSQL)
--- NadeVault MVP: maps + nades (lineups) + search/indexes
--- Notes:
--- - images is stored as JSONB (keys/urls to MinIO), not the binaries
--- - map_id references cs_maps (join cost is negligible; integrity is worth it)
-
 BEGIN;
 
 -- ---------------------------
@@ -29,11 +23,30 @@ END $$;
 -- ---------------------------
 CREATE TABLE IF NOT EXISTS cs_maps (
   id           SMALLSERIAL PRIMARY KEY,
-  code         TEXT NOT NULL UNIQUE,     -- 'mirage', 'inferno', ...
+  code         TEXT NOT NULL UNIQUE,     -- 'mirage', 'inferno'
   display_name TEXT NOT NULL,            -- 'Mirage'
   is_active    BOOLEAN NOT NULL DEFAULT TRUE,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- ---------------------------
+-- IMMUTABLE SEARCH FUNCTION
+-- ---------------------------
+CREATE OR REPLACE FUNCTION nades_tsvector(
+    name text,
+    description text,
+    from_callout text,
+    to_callout text
+) RETURNS tsvector AS $$
+BEGIN
+    RETURN to_tsvector('simple',
+        coalesce(name, '') || ' ' ||
+        coalesce(description, '') || ' ' ||
+        coalesce(from_callout, '') || ' ' ||
+        coalesce(to_callout, '')
+    );
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
 
 -- ---------------------------
 -- NADES (lineups)
@@ -59,15 +72,20 @@ CREATE TABLE IF NOT EXISTS nades (
   is_running    BOOLEAN NOT NULL DEFAULT FALSE,
   is_walking    BOOLEAN NOT NULL DEFAULT FALSE,
 
-  -- media payload (MinIO keys/urls etc)
+  -- media payload
   images        JSONB NOT NULL DEFAULT '{}'::jsonb,
 
-  -- community / basic governance
+  -- community / governance
   is_public     BOOLEAN NOT NULL DEFAULT TRUE,
-  created_by    TEXT, -- later: UUID FK to users, if you add auth
+  created_by    TEXT,
 
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  
+  -- CORRECT DEFINITION (No trailing comma after STORED)
+  search_tsv tsvector GENERATED ALWAYS AS (
+        nades_tsvector(name, description, from_callout, to_callout)
+    ) STORED
 );
 
 -- ---------------------------
@@ -88,23 +106,7 @@ FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 
 -- ---------------------------
--- SEARCH (optional but recommended)
--- ---------------------------
--- Use FTS so you avoid slow ILIKE '%...%' scanning.
--- 'simple' keeps it language-agnostic; you can change to 'portuguese' if you want.
-ALTER TABLE nades
-  ADD COLUMN IF NOT EXISTS search_tsv tsvector
-  GENERATED ALWAYS AS (
-    to_tsvector('simple',
-      coalesce(name,'') || ' ' ||
-      coalesce(description,'') || ' ' ||
-      coalesce(from_callout,'') || ' ' ||
-      coalesce(to_callout,'')
-    )
-  ) STORED;
-
--- ---------------------------
--- INDEXES (make it fly)
+-- INDEXES
 -- ---------------------------
 -- Core filters
 CREATE INDEX IF NOT EXISTS idx_nades_map_type_side
@@ -124,7 +126,7 @@ CREATE INDEX IF NOT EXISTS idx_nades_public_map
 CREATE INDEX IF NOT EXISTS idx_nades_search_tsv
   ON nades USING GIN (search_tsv);
 
--- JSONB index (only useful if you ever query inside images)
+-- JSONB index
 CREATE INDEX IF NOT EXISTS idx_nades_images_gin
   ON nades USING GIN (images);
 
