@@ -26,7 +26,8 @@ func NewRouter(repo repository.NadeDataRepository) *chi.Mux {
 		r.Route("/maps", func(r chi.Router) {
 			r.Get("/{mapCode}/nades", handler.ListNadesByMapID)
 		})
-		
+		r.Post("/nades", handler.AddNade)
+
 	})
 
 	return r

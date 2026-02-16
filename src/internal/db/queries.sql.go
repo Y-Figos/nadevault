@@ -11,6 +11,79 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const addNade = `-- name: AddNade :one
+INSERT INTO nades (
+    name,
+    description,
+    map_id,
+    nade_type,
+    common_side,
+    from_callout,
+    to_callout,
+    mouse_click,
+    is_jumping,
+    is_running,
+    is_walking,
+    images,
+    is_public,
+    created_by
+) VALUES (
+    $1,
+    $2,
+    $3,
+    $4,
+    $5,
+    $6,
+    $7,
+    $8,
+    $9,
+    $10,
+    $11,
+    $12,
+    $13,
+    $14
+) RETURNING id
+`
+
+type AddNadeParams struct {
+	Name        string
+	Description string
+	MapID       int16
+	NadeType    string
+	CommonSide  string
+	FromCallout string
+	ToCallout   string
+	MouseClick  string
+	IsJumping   bool
+	IsRunning   bool
+	IsWalking   bool
+	Images      []byte
+	IsPublic    bool
+	CreatedBy   pgtype.Text
+}
+
+func (q *Queries) AddNade(ctx context.Context, arg AddNadeParams) (int64, error) {
+	row := q.db.QueryRow(ctx, addNade,
+		arg.Name,
+		arg.Description,
+		arg.MapID,
+		arg.NadeType,
+		arg.CommonSide,
+		arg.FromCallout,
+		arg.ToCallout,
+		arg.MouseClick,
+		arg.IsJumping,
+		arg.IsRunning,
+		arg.IsWalking,
+		arg.Images,
+		arg.IsPublic,
+		arg.CreatedBy,
+	)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
 const getMapByCode = `-- name: GetMapByCode :one
 SELECT
 id,

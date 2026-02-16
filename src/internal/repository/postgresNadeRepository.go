@@ -3,10 +3,13 @@ package repository
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 
 	nadevault "github.com/Y-Figos/nadevault/internal/db"
 	"github.com/Y-Figos/nadevault/internal/domain"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type PostgresNadeRepository struct {
@@ -32,7 +35,6 @@ func (r *PostgresNadeRepository) GetNadeByID(ctx context.Context, ID int64) (*do
 
 func (r *PostgresNadeRepository) ListNadesByMapID(ctx context.Context, mapID int16, limit int32, offset int32) ([]domain.Nade, error) {
 
-	
 	params := nadevault.ListNadesByMapIDParams{
 		MapID:  mapID,
 		Limit:  limit,
@@ -143,3 +145,45 @@ func (r *PostgresNadeRepository) GetMapByCode(ctx context.Context, code string) 
 	return csMap, nil
 }
 
+func buildParams(nade *domain.Nade) (*nadevault.AddNadeParams, error) {
+
+	b, err := json.Marshal(nade.Images)
+	if err != nil {
+		return nil, err
+	}
+
+	return &nadevault.AddNadeParams{
+		Name:        nade.Name,
+		Description: nade.Desc,
+		MapID:       nade.MapID,
+		NadeType:    string(nade.Type),
+		CommonSide:  string(nade.CommonSide),
+		FromCallout: nade.From,
+		ToCallout:   nade.To,
+		MouseClick:  string(nade.MouseClick),
+		IsJumping:   nade.IsJumping,
+		IsRunning:   nade.IsRunning,
+		IsWalking:   nade.IsWalking,
+		Images:      b,
+		IsPublic:    nade.IsPublic,
+		CreatedBy: pgtype.Text{
+			String: nade.CreatedBy,
+			Valid:  nade.CreatedBy != "", // Set to TRUE if value exists, FALSE for NULL
+		},
+	}, nil
+}
+
+func (r *PostgresNadeRepository) AddNade(ctx context.Context, nade domain.Nade) (int64, error) {
+	nadeParams, err := buildParams(&nade)
+	if err != nil {
+		return 0, err
+	}
+	id, err := r.q.AddNade(ctx, *nadeParams)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
+			return 0, errors.New(pgErr.Message)
+		}
+	}
+	return id, nil
+}
