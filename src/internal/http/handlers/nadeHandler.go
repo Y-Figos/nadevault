@@ -34,6 +34,16 @@ func (h *NadeHandler) GetNadeByID(w http.ResponseWriter, r *http.Request) {
 	response.WriteJSON(w, http.StatusOK, nade)
 }
 
+func (h *NadeHandler) GetNadeByPublicID(w http.ResponseWriter, r *http.Request) {
+	nadeID := chi.URLParam(r, "nadeID")
+	nade, err := h.repo.GetNadeByPublicID(r.Context(), nadeID)
+	if err != nil {
+		response.WriteAppError(w, err)
+		return
+	}
+	response.WriteJSON(w, http.StatusOK, nade)
+}
+
 func (h *NadeHandler) ListNadesByMapID(w http.ResponseWriter, r *http.Request) {
 	mapCode := chi.URLParam(r, "mapCode")
 	mapData, err := h.repo.GetMapByCode(r.Context(), mapCode)
@@ -87,7 +97,7 @@ func (h *NadeHandler) AddNade(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// map DTO → domain
+	// map DTO -> domain
 	nade := domain.Nade{
 		Name:       req.Name,
 		Desc:       req.Desc,
@@ -100,7 +110,6 @@ func (h *NadeHandler) AddNade(w http.ResponseWriter, r *http.Request) {
 		IsJumping:  req.IsJumping,
 		IsRunning:  req.IsRunning,
 		IsWalking:  req.IsWalking,
-		Images:     req.Images,
 		IsPublic:   true,
 		CreatedBy:  req.CreatedBy,
 	}
@@ -110,6 +119,15 @@ func (h *NadeHandler) AddNade(w http.ResponseWriter, r *http.Request) {
 		response.WriteAppError(w, err)
 		return
 	}
+	log.Printf("nade added with public ID: %s", id)
+	response.WriteJSON(w, http.StatusCreated, map[string]string{"public_id": id})
+}
 
-	response.WriteJSON(w, http.StatusCreated, map[string]int64{"id": id})
+func (h *NadeHandler )GetMapList(w http.ResponseWriter, r *http.Request) {
+	mapList, err := h.repo.GetMapList(r.Context())
+	if err != nil {
+		response.WriteAppError(w, err)
+		return
+	}
+	response.WriteJSON(w, http.StatusOK, mapList)
 }

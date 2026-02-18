@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	"time"
 
 	nadevault "github.com/Y-Figos/nadevault/internal/db"
@@ -27,6 +28,19 @@ func (r *PostgresNadeRepository) GetNadeByID(ctx context.Context, ID int64) (*do
 		return nil, err
 	}
 	nade, err := mapToNade(data)
+	if err != nil {
+		return nil, err
+	}
+	return nade, nil
+}
+
+func (r *PostgresNadeRepository) GetNadeByPublicID(ctx context.Context, publicID string) (*domain.Nade, error) {
+
+	data, err := r.q.GetNadeByPublicID(ctx, publicID)
+	if err != nil {
+		return nil, err
+	}
+	nade, err := mapToNadePublicID(data)
 	if err != nil {
 		return nil, err
 	}
@@ -130,6 +144,28 @@ func buildNade(id int64, name string, desc string, mapID int16, mapName string, 
 	}, nil
 }
 
+func mapToNadePublicID(data nadevault.GetNadeByPublicIDRow) (*domain.Nade, error) {
+	return &domain.Nade{
+		PublicID:   data.PublicID,
+		Name:       data.Name,
+		Desc:       data.Description,
+		MapID:      data.MapID,
+		MapName:    data.MapDisplayName,
+		Type:       domain.NadeType(data.NadeType),
+		CommonSide: domain.Side(data.CommonSide),
+		From:       data.FromCallout,
+		To:         data.ToCallout,
+		MouseClick: domain.MouseClick(data.MouseClick),
+		IsJumping:  data.IsJumping,
+		IsRunning:  data.IsRunning,
+		IsWalking:  data.IsWalking,
+		IsPublic:   data.IsPublic,
+		CreatedBy:  data.CreatedBy.String,
+		CreatedAt:  data.CreatedAt.Time,
+		UpdatedAt:  data.UpdatedAt.Time,
+	}, nil
+}
+
 func (r *PostgresNadeRepository) GetMapByCode(ctx context.Context, code string) (*domain.CsMap, error) {
 	data, err := r.q.GetMapByCode(ctx, code)
 	if err != nil {
@@ -147,11 +183,6 @@ func (r *PostgresNadeRepository) GetMapByCode(ctx context.Context, code string) 
 
 func buildParams(nade *domain.Nade) (*nadevault.AddNadeParams, error) {
 
-	b, err := json.Marshal(nade.Images)
-	if err != nil {
-		return nil, err
-	}
-
 	return &nadevault.AddNadeParams{
 		Name:        nade.Name,
 		Description: nade.Desc,
@@ -164,7 +195,6 @@ func buildParams(nade *domain.Nade) (*nadevault.AddNadeParams, error) {
 		IsJumping:   nade.IsJumping,
 		IsRunning:   nade.IsRunning,
 		IsWalking:   nade.IsWalking,
-		Images:      b,
 		IsPublic:    nade.IsPublic,
 		CreatedBy: pgtype.Text{
 			String: nade.CreatedBy,
@@ -173,17 +203,38 @@ func buildParams(nade *domain.Nade) (*nadevault.AddNadeParams, error) {
 	}, nil
 }
 
-func (r *PostgresNadeRepository) AddNade(ctx context.Context, nade domain.Nade) (int64, error) {
+func (r *PostgresNadeRepository) AddNade(ctx context.Context, nade domain.Nade) (string, error) {
 	nadeParams, err := buildParams(&nade)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 	id, err := r.q.AddNade(ctx, *nadeParams)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "22P02" {
-			return 0, errors.New(pgErr.Message)
+			return "", errors.New(pgErr.Message)
+		}
+		log.Printf("error adding nade: %v", err)
+		return "", err
+
+	}
+	return id.PublicID, nil
+}
+
+func (r *PostgresNadeRepository) GetMapList(ctx context.Context) ([]domain.CsMap, error) {
+	data, err := r.q.GetMaps(ctx)
+	if err != nil {
+		return nil, err
+	}
+	maps := make([]domain.CsMap, len(data))
+	for i, m := range data {
+		maps[i] = domain.CsMap{
+			ID:          m.ID,
+			Code:        m.Code,
+			DisplayName: m.DisplayName,
+			IsActive:    m.IsActive,
+			CreatedAt:   m.CreatedAt.Time,
 		}
 	}
-	return id, nil
+	return maps, nil
 }

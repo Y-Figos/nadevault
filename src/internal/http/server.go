@@ -28,11 +28,13 @@ func NewRouter(repo repository.NadeDataRepository, renderer *web.Renderer) *chi.
 		r.Route("/maps", func(r chi.Router) {
 			r.Get("/{mapCode}/nades", nadeHandler.ListNadesByMapID)
 		})
+		r.Get("/maps", nadeHandler.GetMapList)
 		r.Post("/nades", nadeHandler.AddNade)
 
 	})
 	r.Get("/maps/{mapCode}", templateRenderer.RenderMapPage)
 	r.Get("/maps/{mapCode}/nades", templateRenderer.RenderNadeListPartial)
-
+	r.Get("/admin/nades", templateRenderer.AddNadeForm)
+	r.Post("/admin/nades/new", templateRenderer.AddNade)
 	return r
 }

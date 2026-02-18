@@ -29,6 +29,7 @@ const (
 type Nade struct {
 	// Basic Info
 	ID         int64    `json:"id,omitempty"`
+	PublicID string `json:"public_id,omitempty"`
 	Name       string   `json:"name,omitempty"`
 	Desc       string   `json:"desc,omitempty"`
 	MapName    string   `json:"map_name,omitempty"`

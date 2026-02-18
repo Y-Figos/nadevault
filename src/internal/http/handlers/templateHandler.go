@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Y-Figos/nadevault/internal/domain"
 	"github.com/Y-Figos/nadevault/internal/http/response"
@@ -47,4 +48,59 @@ func (tr *TemplateRenderer) RenderNadeListPartial(w http.ResponseWriter, r *http
 		Nades []domain.Nade
 	}{Nades: nadeList}
 	tr.renderer.RenderTemplate(w, http.StatusOK, "_nade_list", nades)
+}
+
+func (tr *TemplateRenderer) AddNadeForm(w http.ResponseWriter, r *http.Request) {
+	csMaps, err := tr.repo.GetMapList(r.Context())
+	if err != nil {
+		response.WriteAppError(w, err)
+		return
+	}
+	data := struct {
+		Maps []domain.CsMap
+	}{
+		Maps: csMaps,
+	}
+	tr.renderer.RenderTemplate(w, http.StatusOK, "base", data)
+}
+
+func (tr *TemplateRenderer) AddNade(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		response.WriteError(w, http.StatusBadRequest, "invalid_form", "invalid form data", nil)
+		return
+	}
+	mapid, err := strconv.ParseInt(r.FormValue("map_id"), 10, 16)
+	if err != nil {
+		response.WriteError(w, http.StatusBadRequest, "invalid_map_id", "invalid map ID", nil)
+		return
+	}
+	// map DTO -> domain
+	nade := domain.Nade{
+		Name:       r.FormValue("name"),
+		Desc:       r.FormValue("desc"),
+		MapID:      int16(mapid),
+		Type:       domain.NadeType(r.FormValue("type")),
+		CommonSide: domain.Side(r.FormValue("side")),
+		From:       r.FormValue("from"),
+		To:         r.FormValue("to"),
+		MouseClick: domain.MouseClick(r.FormValue("mouse_click")),
+		IsJumping:  r.FormValue("is_jumping") == "on",
+		IsRunning:  r.FormValue("is_running") == "on",
+		IsWalking:  r.FormValue("is_walking") == "on",
+		IsPublic:   true,
+		CreatedBy:  r.FormValue("created_by"),
+	}
+
+	id, err := tr.repo.AddNade(r.Context(), nade)
+	if err != nil {
+		response.WriteAppError(w, err)
+		return
+	}
+	data := struct {
+		PublicID string
+	}{
+		PublicID: id,
+	}
+	tr.renderer.RenderTemplate(w, http.StatusCreated, "uploadForm", data)
 }

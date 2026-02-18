@@ -1,5 +1,5 @@
 BEGIN;
-
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 -- ---------------------------
 -- ENUMS
 -- ---------------------------
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS nades (
   -- basic info
   name          TEXT NOT NULL,
   description   TEXT NOT NULL DEFAULT '',
-
+  public_id     UUID NOT NULL DEFAULT gen_random_uuid() UNIQUE,
   map_id        SMALLINT NOT NULL REFERENCES cs_maps(id) ON DELETE RESTRICT,
   nade_type     nade_type NOT NULL,
   common_side   side_type NOT NULL,

@@ -16,3 +16,5 @@ sql:
           go_type: "string"
         - db_type: "mouse_click"
           go_type: "string"
+        - db_type: "uuid"
+          go_type: "string"

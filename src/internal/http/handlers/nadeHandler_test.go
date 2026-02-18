@@ -16,10 +16,11 @@ import (
 )
 
 type fakeRepo struct {
-	getNadeByIDFn      func(ctx context.Context, id int64) (*domain.Nade, error)
-	listNadesByMapIDFn func(ctx context.Context, mapID int16, limit int32, offset int32) ([]domain.Nade, error)
-	getMapByCodeFn     func(ctx context.Context, code string) (*domain.CsMap, error)
-	addNadeFn          func(ctx context.Context, nade domain.Nade) (int64, error)
+	getNadeByIDFn       func(ctx context.Context, id int64) (*domain.Nade, error)
+	listNadesByMapIDFn  func(ctx context.Context, mapID int16, limit int32, offset int32) ([]domain.Nade, error)
+	getMapByCodeFn      func(ctx context.Context, code string) (*domain.CsMap, error)
+	addNadeFn           func(ctx context.Context, nade domain.Nade) (string, error)
+	getnadeByPublicIDFn func(ctx context.Context, publicID string) (*domain.Nade, error)
 }
 
 func (f fakeRepo) GetNadeByID(ctx context.Context, id int64) (*domain.Nade, error) {
@@ -34,8 +35,15 @@ func (f fakeRepo) GetMapByCode(ctx context.Context, code string) (*domain.CsMap,
 	return f.getMapByCodeFn(ctx, code)
 }
 
-func (f fakeRepo) AddNade(ctx context.Context, nade domain.Nade) (int64, error) {
+func (f fakeRepo) AddNade(ctx context.Context, nade domain.Nade) (string, error) {
 	return f.addNadeFn(ctx, nade)
+}
+
+func (f fakeRepo) GetNadeByPublicID(ctx context.Context, publicID string) (*domain.Nade, error) {
+	return f.getnadeByPublicIDFn(ctx, publicID)
+}
+func (f fakeRepo) GetMapList(ctx context.Context) ([]domain.CsMap, error) {
+	panic("not implemented")
 }
 
 func reqWithURLParam(req *http.Request, key, value string) *http.Request {
@@ -139,9 +147,9 @@ func TestGetNadeByID(t *testing.T) {
 func TestAddNades(t *testing.T) {
 	t.Run("invalid json returns 400 invalid_json", func(t *testing.T) {
 		h := NewNadeHandler(fakeRepo{
-			addNadeFn: func(ctx context.Context, nade domain.Nade) (int64, error) {
+			addNadeFn: func(ctx context.Context, nade domain.Nade) (string, error) {
 				t.Fatal("repo should not be called when json is invalid")
-				return 0, nil
+				return "", nil
 			},
 		})
 		req := httptest.NewRequest(http.MethodPost, "/api/nades", nil)
@@ -159,9 +167,9 @@ func TestAddNades(t *testing.T) {
 	})
 	t.Run("unknown fields returns 400 invalid_json", func(t *testing.T) {
 		h := NewNadeHandler(fakeRepo{
-			addNadeFn: func(ctx context.Context, nade domain.Nade) (int64, error) {
+			addNadeFn: func(ctx context.Context, nade domain.Nade) (string, error) {
 				t.Fatal("repo should not be called when json has unknown fields")
-				return 0, nil
+				return "", nil
 			},
 		})
 
@@ -181,9 +189,9 @@ func TestAddNades(t *testing.T) {
 	})
 	t.Run("validation of fields returns 400 validation_error", func(t *testing.T) {
 		h := NewNadeHandler(fakeRepo{
-			addNadeFn: func(ctx context.Context, nade domain.Nade) (int64, error) {
+			addNadeFn: func(ctx context.Context, nade domain.Nade) (string, error) {
 				t.Fatal("repo should not be called when validation fails")
-				return 0, nil
+				return "", nil
 			},
 		})
 
@@ -241,7 +249,7 @@ func TestAddNades(t *testing.T) {
 		called := false
 
 		h := NewNadeHandler(fakeRepo{
-			addNadeFn: func(ctx context.Context, nade domain.Nade) (int64, error) {
+			addNadeFn: func(ctx context.Context, nade domain.Nade) (string, error) {
 				called = true
 
 				// checa só o essencial (contrato DTO -> domain)
@@ -258,7 +266,7 @@ func TestAddNades(t *testing.T) {
 					t.Fatalf("expected type %q got %q", "smoke", nade.Type)
 				}
 
-				return 123, nil
+				return "123", nil
 			},
 		})
 
@@ -304,8 +312,8 @@ func TestAddNades(t *testing.T) {
 	})
 	t.Run("conflict returns 409 conflict", func(t *testing.T) {
 		h := NewNadeHandler(fakeRepo{
-			addNadeFn: func(ctx context.Context, nade domain.Nade) (int64, error) {
-				return 0, &pgconn.PgError{Code: "23505"}
+			addNadeFn: func(ctx context.Context, nade domain.Nade) (string, error) {
+				return "", &pgconn.PgError{Code: "23505"}
 			},
 		})
 

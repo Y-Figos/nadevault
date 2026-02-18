@@ -24,7 +24,6 @@ INSERT INTO nades (
     is_jumping,
     is_running,
     is_walking,
-    images,
     is_public,
     created_by
 ) VALUES (
@@ -40,9 +39,8 @@ INSERT INTO nades (
     $10,
     $11,
     $12,
-    $13,
-    $14
-) RETURNING id
+    $13
+) RETURNING id, public_id
 `
 
 type AddNadeParams struct {
@@ -57,12 +55,16 @@ type AddNadeParams struct {
 	IsJumping   bool
 	IsRunning   bool
 	IsWalking   bool
-	Images      []byte
 	IsPublic    bool
 	CreatedBy   pgtype.Text
 }
 
-func (q *Queries) AddNade(ctx context.Context, arg AddNadeParams) (int64, error) {
+type AddNadeRow struct {
+	ID       int64
+	PublicID string
+}
+
+func (q *Queries) AddNade(ctx context.Context, arg AddNadeParams) (AddNadeRow, error) {
 	row := q.db.QueryRow(ctx, addNade,
 		arg.Name,
 		arg.Description,
@@ -75,13 +77,12 @@ func (q *Queries) AddNade(ctx context.Context, arg AddNadeParams) (int64, error)
 		arg.IsJumping,
 		arg.IsRunning,
 		arg.IsWalking,
-		arg.Images,
 		arg.IsPublic,
 		arg.CreatedBy,
 	)
-	var id int64
-	err := row.Scan(&id)
-	return id, err
+	var i AddNadeRow
+	err := row.Scan(&i.ID, &i.PublicID)
+	return i, err
 }
 
 const getMapByCode = `-- name: GetMapByCode :one
@@ -106,6 +107,44 @@ func (q *Queries) GetMapByCode(ctx context.Context, code string) (CsMap, error) 
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const getMaps = `-- name: GetMaps :many
+SELECT
+id,
+code,
+display_name,
+is_active,
+created_at
+FROM cs_maps
+WHERE is_active = true
+ORDER BY display_name
+`
+
+func (q *Queries) GetMaps(ctx context.Context) ([]CsMap, error) {
+	rows, err := q.db.Query(ctx, getMaps)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CsMap
+	for rows.Next() {
+		var i CsMap
+		if err := rows.Scan(
+			&i.ID,
+			&i.Code,
+			&i.DisplayName,
+			&i.IsActive,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getNade = `-- name: GetNade :one
@@ -159,6 +198,78 @@ func (q *Queries) GetNade(ctx context.Context, id int64) (GetNadeRow, error) {
 	var i GetNadeRow
 	err := row.Scan(
 		&i.ID,
+		&i.MapDisplayName,
+		&i.Name,
+		&i.Description,
+		&i.MapID,
+		&i.NadeType,
+		&i.CommonSide,
+		&i.FromCallout,
+		&i.ToCallout,
+		&i.MouseClick,
+		&i.IsJumping,
+		&i.IsRunning,
+		&i.IsWalking,
+		&i.Images,
+		&i.IsPublic,
+		&i.CreatedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getNadeByPublicID = `-- name: GetNadeByPublicID :one
+SELECT
+nades.public_id,
+cs_maps.display_name AS map_display_name,
+name,
+description,
+map_id,
+nade_type,
+common_side,
+from_callout,
+to_callout,
+mouse_click,
+is_jumping,
+is_running,
+is_walking,
+images,
+is_public,
+created_by,
+nades.created_at,
+updated_at
+FROM nades
+JOIN cs_maps ON nades.map_id = cs_maps.id
+WHERE nades.public_id = $1
+`
+
+type GetNadeByPublicIDRow struct {
+	PublicID       string
+	MapDisplayName string
+	Name           string
+	Description    string
+	MapID          int16
+	NadeType       string
+	CommonSide     string
+	FromCallout    string
+	ToCallout      string
+	MouseClick     string
+	IsJumping      bool
+	IsRunning      bool
+	IsWalking      bool
+	Images         []byte
+	IsPublic       bool
+	CreatedBy      pgtype.Text
+	CreatedAt      pgtype.Timestamptz
+	UpdatedAt      pgtype.Timestamptz
+}
+
+func (q *Queries) GetNadeByPublicID(ctx context.Context, publicID string) (GetNadeByPublicIDRow, error) {
+	row := q.db.QueryRow(ctx, getNadeByPublicID, publicID)
+	var i GetNadeByPublicIDRow
+	err := row.Scan(
+		&i.PublicID,
 		&i.MapDisplayName,
 		&i.Name,
 		&i.Description,

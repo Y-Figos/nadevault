@@ -20,6 +20,7 @@ type Nade struct {
 	ID          int64
 	Name        string
 	Description string
+	PublicID    string
 	MapID       int16
 	NadeType    string
 	CommonSide  string
