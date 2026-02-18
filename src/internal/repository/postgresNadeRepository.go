@@ -238,3 +238,17 @@ func (r *PostgresNadeRepository) GetMapList(ctx context.Context) ([]domain.CsMap
 	}
 	return maps, nil
 }
+func (r *PostgresNadeRepository) GetMapByID(ctx context.Context, ID int16) (*domain.CsMap, error) {
+	data, err := r.q.GetMapByID(ctx, ID)
+	if err != nil {
+		return nil, err
+	}
+	csMap := &domain.CsMap{
+		ID:          data.ID,
+		Code:        data.Code,
+		DisplayName: data.DisplayName,
+		IsActive:    data.IsActive,
+		CreatedAt:   data.CreatedAt.Time,
+	}
+	return csMap, nil
+}

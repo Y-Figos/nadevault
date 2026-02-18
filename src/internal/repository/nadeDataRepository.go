@@ -13,4 +13,5 @@ type NadeDataRepository interface {
 	GetMapByCode(ctx context.Context, code string) (*domain.CsMap, error)
 	AddNade(ctx context.Context, nade domain.Nade) (string, error)
 	GetMapList(ctx context.Context) ([]domain.CsMap, error)
+	GetMapByID(ctx context.Context, ID int16) (*domain.CsMap, error)
 }

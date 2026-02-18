@@ -1,0 +1,53 @@
+package templates
+import "github.com/Y-Figos/nadevault/internal/domain"
+templ UploadForm(nade domain.Nade, publicID string) {
+    if publicID != "" {
+        <div class="card" id="card">
+            <div class="card-header">
+                <div class="card-title"> Nade Uploaded Successfully! </div>
+                <p>{publicID}</p>
+            </div>
+            <div class="card-body">
+                <h3>Nade uploaded successfully! Public ID: {publicID}</h3>
+                <div class="stack">
+                    <div class="row">
+                        <label>Name</label>
+                        <span>{nade.Name}</span>
+                    </div>
+                    <div class="row">
+                        <label>Description</label>
+                        <span>{nade.Desc}</span>
+                    </div>
+                    <div class="row">
+                        <label>Map</label>
+                        <span>{nade.MapName}</span>
+                    </div>
+                    <div class="row">
+                        <label>Type</label>
+                        <span>{nade.Type}</span>
+                    </div>
+                    <div class="row">
+                        <label>Common Side</label>
+                        <span>{nade.CommonSide}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Upload Images</div>
+            </div>
+            <div class="card-body">
+                
+            </div>
+        </div>
+    } else {
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Upload Failed. Try uploading again.</div>
+            </div>
+        </div>
+    }
+    
+}

@@ -19,6 +19,7 @@ type fakeRepo struct {
 	getNadeByIDFn       func(ctx context.Context, id int64) (*domain.Nade, error)
 	listNadesByMapIDFn  func(ctx context.Context, mapID int16, limit int32, offset int32) ([]domain.Nade, error)
 	getMapByCodeFn      func(ctx context.Context, code string) (*domain.CsMap, error)
+	getMapByIDFn        func(ctx context.Context, ID int16) (*domain.CsMap, error)
 	addNadeFn           func(ctx context.Context, nade domain.Nade) (string, error)
 	getnadeByPublicIDFn func(ctx context.Context, publicID string) (*domain.Nade, error)
 }
@@ -43,6 +44,10 @@ func (f fakeRepo) GetNadeByPublicID(ctx context.Context, publicID string) (*doma
 	return f.getnadeByPublicIDFn(ctx, publicID)
 }
 func (f fakeRepo) GetMapList(ctx context.Context) ([]domain.CsMap, error) {
+	panic("not implemented")
+}
+
+func (f fakeRepo) GetMapByID(ctx context.Context, ID int16) (*domain.CsMap, error) {
 	panic("not implemented")
 }
 

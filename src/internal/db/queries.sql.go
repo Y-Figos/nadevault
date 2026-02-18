@@ -109,6 +109,31 @@ func (q *Queries) GetMapByCode(ctx context.Context, code string) (CsMap, error) 
 	return i, err
 }
 
+const getMapByID = `-- name: GetMapByID :one
+SELECT
+id,
+code,
+display_name,
+is_active,
+created_at
+FROM cs_maps
+WHERE is_active = true
+AND id = $1
+`
+
+func (q *Queries) GetMapByID(ctx context.Context, id int16) (CsMap, error) {
+	row := q.db.QueryRow(ctx, getMapByID, id)
+	var i CsMap
+	err := row.Scan(
+		&i.ID,
+		&i.Code,
+		&i.DisplayName,
+		&i.IsActive,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getMaps = `-- name: GetMaps :many
 SELECT
 id,

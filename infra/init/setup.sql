@@ -9,6 +9,11 @@ EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
 DO $$ BEGIN
+  CREATE TYPE image_status AS ENUM ('pending','processing','ready','failed');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
   CREATE TYPE side_type AS ENUM ('T','CT');
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
@@ -74,7 +79,7 @@ CREATE TABLE IF NOT EXISTS nades (
 
   -- media payload
   images        JSONB NOT NULL DEFAULT '{}'::jsonb,
-
+  images_status image_status NOT NULL DEFAULT 'pending',
   -- community / governance
   is_public     BOOLEAN NOT NULL DEFAULT TRUE,
   created_by    TEXT,

@@ -123,3 +123,14 @@ created_at
 FROM cs_maps
 WHERE is_active = true
 ORDER BY display_name;
+
+-- name: GetMapByID :one
+SELECT
+id,
+code,
+display_name,
+is_active,
+created_at
+FROM cs_maps
+WHERE is_active = true
+AND id = $1;

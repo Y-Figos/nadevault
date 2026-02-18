@@ -30,16 +30,22 @@ services:
       command: server /data --console-address ":9001"
       volumes:
         - "./infra/minio_data:/data"
+      healthcheck:
+        test: ["CMD", "mc", "ready", "local"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
     minio-init:
       image: quay.io/minio/mc
       depends_on:
-        - minio
+        minio:
+            condition: service_healthy
       entrypoint: >
         /bin/sh -c "
-        mc alias set local http://minio:9000 $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD} &&
-        mc mb -p local/nadevault || true &&
-        mc anonymous set download local/nadevault &&
-        exit 0;
+        mc alias set local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};        
+        mc mb -p local/nv-public;
+        mc anonymous set download local/nv-public;
+        mc mb -p local/nv-internal;
         "
       environment:
         MINIO_ROOT_USER: ${MINIO_ROOT_USER}

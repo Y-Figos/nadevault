@@ -1,0 +1,90 @@
+package templates
+import "github.com/Y-Figos/nadevault/internal/domain"
+templ AddNadeForm(Maps []domain.CsMap) {
+  @Layout() {
+      <div class="card" id="card">
+        <div class="card-header">
+            <div class="card-title">Add Nade</div>  
+        </div>
+         <div class="card-body" id="nade-info">
+                <form method="post" id="add-nade-form" hx-post="/admin/nades/new" hx-target="#card" hx-swap="outerHTML">
+                    <div class="form-grid">
+                        <div class="col-6">
+                            <label for="name">Nade Name</label>
+                            <input type="text" id="name" name="name" class="input" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="desc">Description</label>
+                            <textarea id="desc" name="desc" required></textarea>
+                        </div>
+                        <div class="col-6">
+                            <label for="type">Type</label>
+                            <select id="type" name="type" required>
+                                <option value="">Select type</option>
+                                <option value="smoke">Smoke</option>
+                                <option value="flashbang">Flash</option>
+                                <option value="frag">Frag</option>
+                                <option value="moly">Molotov</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="map">Map</label>
+                            <select id="map_id" name="map_id" required>
+                                for _, m := range Maps {
+                                    <option value={m.ID}>{m.DisplayName}</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="from" class="from-label">From</label>
+                            <input type="text" id="from" name="from"class="input" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="to" class="to-label">To</label>
+                            <input type="text" id="to" name="to" class="input" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="side">Side</label>
+                            <select id="side" name="side" required>
+                                <option value="">Select side</option>
+                                <option value="T">Terrorist</option>
+                                <option value="CT">Counter-Terrorist</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="mouse_click">Mouse Click</label>
+                            <select id="mouse_click" name="mouse_click">
+                                <option value="mouse1">Mouse1</option>
+                                <option value="mouse2">Mouse2</option>
+                                <option value="both">both</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-12 row">
+                            <label class="row">
+                                <input type="checkbox" name="is_jumping">
+                                <span>Jump Throw</span>
+                            </label>
+
+                            <label class="row">
+                                <input type="checkbox" name="is_running">
+                                <span>Run Throw</span>
+                            </label>
+
+                            <label class="row">
+                                <input type="checkbox" name="is_walking">
+                                <span>Walk Throw</span>
+                            </label>
+                        </div>
+                            <input type="hidden" name="created_by" value="admin_test">
+                        <div class="col-12">
+                            <button class="btn btn-primary" type="submit">
+                                Save Nade
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+      </div>
+  }
+}

@@ -26,10 +26,19 @@ const (
 	CounterTerrorists Side = "CT"
 )
 
+type ImageStatus string
+
+const (
+	Pending    ImageStatus = "pending"
+	Processing ImageStatus = "processing"
+	Ready      ImageStatus = "ready"
+	Failed     ImageStatus = "failed"
+)
+
 type Nade struct {
 	// Basic Info
 	ID         int64    `json:"id,omitempty"`
-	PublicID string `json:"public_id,omitempty"`
+	PublicID   string   `json:"public_id,omitempty"`
 	Name       string   `json:"name,omitempty"`
 	Desc       string   `json:"desc,omitempty"`
 	MapName    string   `json:"map_name,omitempty"`
@@ -44,7 +53,8 @@ type Nade struct {
 	IsRunning  bool       `json:"is_running"`
 	IsWalking  bool       `json:"is_walking"`
 	//Images urls stored in S3/Minio
-	Images NadeImages `json:"images,omitempty"`
+	Images      NadeImages  `json:"images,omitempty"`
+	ImageStatus ImageStatus `json:"image_status,omitempty"`
 	// Metadata
 	CreatedBy string    `json:"created_by,omitempty"`
 	CreatedAt time.Time `json:"created_at,omitempty"`

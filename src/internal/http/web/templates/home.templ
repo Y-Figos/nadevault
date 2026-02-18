@@ -1,0 +1,29 @@
+package templates
+
+templ HomePage() {
+
+  @Layout() {
+    <div class="stack">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">NadeVault</div>
+          <div class="badge">alpha</div>
+        </div>
+
+        <div class="card-body stack">
+          <h1>Search</h1>
+          <p>Type a map / from / to and press search.</p>
+
+          <form class="row" method="get" action="/search">
+            <input class="input" type="text" name="q" placeholder="inferno banana smoke..." />
+            <button class="btn btn-primary" type="submit">Search</button>
+          </form>
+
+          <div class="small">
+            Tip: later this becomes <code>hx-get</code> \for live search.
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+}

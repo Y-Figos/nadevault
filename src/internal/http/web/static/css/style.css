@@ -1,0 +1,324 @@
+/* NadeVault Micro Design System 
+  Inspirado na densidade e paleta do HLTV.org
+*/
+
+:root {
+  /* Paleta HLTV Dark */
+  --bg: #121921;            /* Fundo principal profundo */
+  --panel: #1b242d;         /* Cards e containers principais */
+  --panel-2: #252e39;       /* Elementos secundários e hover */
+  --text: #ffffff;
+  --muted: #94a3b8;         /* Texto de suporte legível */
+  
+  --border: #2d3844;        /* Bordas sólidas (HLTV raramente usa sombras) */
+  
+  /* Cores de Ação */
+  --accent: #ff9d00;        /* O clássico laranja HLTV */
+  --accent-alt: #3a82f6;    /* Azul para links e info */
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --ok: #22c55e;
+
+  /* Cores por tipo de Granada (Útil para o NadeVault) */
+  --smoke: #94a3b8;
+  --flash: #fbbf24;
+  --molly: #f87171;
+  --he: #4ade80;
+
+  --shadow: 0 4px 12px rgba(0,0,0,0.4);
+  --radius: 4px;            /* HLTV é mais quadrado/sóbrio */
+  --radius-sm: 2px;
+
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --sans: "Open Sans", system-ui, -apple-system, sans-serif;
+  --maxw: 1100px;
+}
+
+/* Reset & Base */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  background-image: linear-gradient(180deg, #161f29 0%, var(--bg) 400px);
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--accent-alt);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+a:hover { color: var(--accent); }
+
+code, pre {
+  font-family: var(--mono);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+code { padding: 0.1rem 0.3rem; font-size: 0.9em; }
+pre { padding: 1rem; overflow: auto; }
+
+/* --- Layout --- */
+.container {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.stack { display: grid; gap: 12px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.spread { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+.hr {
+  height: 1px;
+  background: var(--border);
+  border: 0;
+  margin: 16px 0;
+}
+
+/* --- Navigation (HLTV Style) --- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--panel);
+  border-bottom: 3px solid var(--accent); /* Linha laranja característica */
+  box-shadow: var(--shadow);
+}
+
+.topbar-inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 16px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #fff;
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+/* --- Typography --- */
+h1, h2, h3 { margin: 0; font-weight: 700; }
+h1 { font-size: 1.5rem; letter-spacing: -0.5px; }
+h2 { font-size: 1.1rem; color: #fff; text-transform: uppercase; }
+h3 { font-size: 0.95rem; color: #fff; }
+
+p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.small { font-size: 0.8rem; color: var(--muted); }
+
+/* --- Cards & Panels --- */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 10px 14px;
+  background: rgba(255,255,255, 0.03);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.card-body { padding: 14px; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+
+/* --- Forms (Compact & Solid) --- */
+label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.input, select, textarea {
+  width: 100%;
+  color: var(--text);
+  background: #121921;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-alt);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 12px;
+}
+.col-12 { grid-column: span 12; }
+.col-6 { grid-column: span 6; }
+.col-4 { grid-column: span 4; }
+.col-3 { grid-column: span 3; }
+
+/* --- Buttons --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+
+.btn:hover {
+  background: #2e3947;
+  border-color: var(--muted);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #121921; /* Texto escuro no botão laranja */
+}
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-danger {
+  background: #441a1a;
+  border-color: var(--danger);
+  color: #ff8080;
+}
+
+/* --- Tables (Data-driven) --- */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.table th {
+  padding: 10px 12px;
+  background: var(--panel-2);
+  color: var(--muted);
+  text-transform: uppercase;
+  text-align: left;
+  border-bottom: 2px solid var(--border);
+}
+
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table tr:hover td {
+  background: rgba(255,255,255, 0.02);
+}
+
+/* --- Nade Cards (Grid) --- */
+.nade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+.nade-card {
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent-alt); /* Cor padrão */
+  background: var(--panel);
+  padding: 12px;
+  border-radius: var(--radius);
+  transition: transform 0.1s;
+}
+
+/* Variantes por utilitário */
+.nade-card.smoke { border-left-color: var(--smoke); }
+.nade-card.flash { border-left-color: var(--flash); }
+.nade-card.molly { border-left-color: var(--molly); }
+.nade-card.he    { border-left-color: var(--he); }
+
+.nade-card:hover {
+  background: var(--panel-2);
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+.k { color: var(--muted); font-weight: 600; }
+.v { color: var(--text); }
+
+/* --- Feedback --- */
+.alert {
+  border-left: 4px solid var(--border);
+  background: var(--panel);
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+}
+.alert-ok { border-left-color: var(--ok); background: #162a1e; }
+.alert-danger { border-left-color: var(--danger); background: #2a1616; }
+
+/* HTMX Loading */
+.htmx-indicator {
+  opacity: 0;
+  transition: opacity 200ms ease-in;
+}
+.htmx-request .htmx-indicator { opacity: 1; }
+
+@media (max-width: 820px) {
+  .col-6, .col-4, .col-3 { grid-column: span 12; }
+  .nade-grid { grid-template-columns: 1fr; }
+}

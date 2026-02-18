@@ -1,53 +1,93 @@
 {{define "addNadeForm"}}
 
-<div class="add-nade-form-container" hx-target="#map_id">
-    <h1>Add a new nade</h1>
-    <form method="post" id="add-nade-form" hx-post="/admin/nades/new" hx-target="#upload-slot" hx-swap="outerHTML">
-        <div class="form-group">
-            <label for="name">Nade Name</label>
-            <input type="text" id="name" name="name" required>
-            <label for="desc">Description</label>
-            <textarea id="desc" name="desc" required></textarea>
-            <label for="type">Type</label>
-            <select id="type" name="type" required>
-                <option value="">Select type</option>
-                <option value="smoke">Smoke</option>
-                <option value="flashbang">Flash</option>
-                <option value="frag">Frag</option>
-                <option value="moly">Molotov</option>
-            </select>
-            <label for="map">Map</label>
-            <select id="map_id" name="map_id" required>
-                {{ range .Maps }}
-                <option value="{{.ID}}">{{.DisplayName}}</option>
-                {{ end }}
-            </select>
-            <label for="to" class="to-label">To</label>
-            <input type="text" id="to" name="to" required>
-            <label for="from" class="from-label">From</label>
-            <input type="text" id="from" name="from" required>
-            <label for="side">Side</label>
-            <select id="side" name="side" required>
-                <option value="">Select side</option>
-                <option value="T">Terrorist</option>
-                <option value="CT">Counter-Terrorist</option>
-            </select>
-            <label for="mouse_click">Mouse Click</label>
-            <select id="mouse_click" name="mouse_click">
-                <option value="mouse1">Mouse1</option>
-                <option value="mouse2">Mouse2</option>
-                <option value="both">both</option>
-            </select>
-            <label for="is_jumping">Jump Throw</label>
-            <input type="checkbox" name="is_jumping">
-            <label for="is_running">Run Throw</label>
-            <input type="checkbox" name="is_running">
-            <label for="is_walking">Walk Throw</label>
-            <input type="checkbox" name="is_walking">
-            <input type="hidden" name="created_by" value="admin_test">
-            <button type="submit">Save Nade</button>
+<div class="container" hx-target="#map_id">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                Add a new nade
+            </div>
+            <div class="card-subtitle">
+                Admin panel - add nade form
+            </div>
         </div>
-    </form>
-    
+    </div>
+    <div class="card-body">
+        <form method="post" id="add-nade-form" hx-post="/admin/nades/new" hx-target="#upload-slot" hx-swap="outerHTML">
+            <div class="form-grid">
+                <div class="col-6">
+                    <label for="name">Nade Name</label>
+                    <input type="text" id="name" name="name" class="input" required>
+                </div>
+                <div class="col-6">
+                    <label for="desc">Description</label>
+                    <textarea id="desc" name="desc" required></textarea>
+                </div>
+                <div class="col-6">
+                    <label for="type">Type</label>
+                    <select id="type" name="type" required>
+                        <option value="">Select type</option>
+                        <option value="smoke">Smoke</option>
+                        <option value="flashbang">Flash</option>
+                        <option value="frag">Frag</option>
+                        <option value="moly">Molotov</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label for="map">Map</label>
+                    <select id="map_id" name="map_id" required>
+                        {{ range .Maps }}
+                        <option value="{{.ID}}">{{.DisplayName}}</option>
+                        {{ end }}
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label for="from" class="from-label">From</label>
+                    <input type="text" id="from" name="from"class="input" required>
+                </div>
+                <div class="col-6">
+                    <label for="to" class="to-label">To</label>
+                    <input type="text" id="to" name="to" class="input" required>
+                </div>
+                <div class="col-6">
+                    <label for="side">Side</label>
+                    <select id="side" name="side" required>
+                    <option value="">Select side</option>
+                    <option value="T">Terrorist</option>
+                    <option value="CT">Counter-Terrorist</option>
+                </select>
+                <div class="col-6">
+                    <label for="mouse_click">Mouse Click</label>
+                    <select id="mouse_click" name="mouse_click">
+                        <option value="mouse1">Mouse1</option>
+                        <option value="mouse2">Mouse2</option>
+                        <option value="both">both</option>
+                    </select>
+                </div>
+                
+                <div class="col-12 row">
+                    <label class="row">
+                        <input type="checkbox" name="is_jumping">
+                        <span>Jump Throw</span>
+                    </label>
+
+                    <label class="row">
+                        <input type="checkbox" name="is_running">
+                        <span>Run Throw</span>
+                    </label>
+
+                    <label class="row">
+                        <input type="checkbox" name="is_walking">
+                        <span>Walk Throw</span>
+                    </label>
+                </div>
+                    <input type="hidden" name="created_by" value="admin_test">
+                <div class="col-12">
+                    <button class="btn btn-primary" type="submit">
+                        Save Nade
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 {{end}}
