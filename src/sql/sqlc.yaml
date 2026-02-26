@@ -10,11 +10,13 @@ sql:
         out: ../internal/db
         sql_package: pgx/v5
         overrides:
+        - db_type: "image_status"
+          go_type: "github.com/Y-Figos/nadevault/internal/domain.ImageStatus"
         - db_type: "nade_type"
-          go_type: "string"
+          go_type: "github.com/Y-Figos/nadevault/internal/domain.NadeType"
         - db_type: "side_type"
-          go_type: "string"
+          go_type: "github.com/Y-Figos/nadevault/internal/domain.Side"
         - db_type: "mouse_click"
-          go_type: "string"
+          go_type: "github.com/Y-Figos/nadevault/internal/domain.MouseClick"
         - db_type: "uuid"
-          go_type: "string"
+          go_type: "github.com/google/uuid.UUID"

@@ -10,6 +10,7 @@ import (
 	"github.com/Y-Figos/nadevault/internal/http/response"
 	"github.com/Y-Figos/nadevault/internal/repository"
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 )
 
 type NadeHandler struct {
@@ -36,7 +37,12 @@ func (h *NadeHandler) GetNadeByID(w http.ResponseWriter, r *http.Request) {
 
 func (h *NadeHandler) GetNadeByPublicID(w http.ResponseWriter, r *http.Request) {
 	nadeID := chi.URLParam(r, "nadeID")
-	nade, err := h.repo.GetNadeByPublicID(r.Context(), nadeID)
+	nadeUUID, err := uuid.Parse(nadeID)
+	if err != nil {
+		response.WriteError(w, http.StatusBadRequest, "invalid_uuid", "invalid UUID format", nil)
+		return
+	}
+	nade, err := h.repo.GetNadeByPublicID(r.Context(), nadeUUID)
 	if err != nil {
 		response.WriteAppError(w, err)
 		return
@@ -99,19 +105,25 @@ func (h *NadeHandler) AddNade(w http.ResponseWriter, r *http.Request) {
 
 	// map DTO -> domain
 	nade := domain.Nade{
-		Name:       req.Name,
-		Desc:       req.Desc,
-		MapID:      req.MapID,
-		Type:       domain.NadeType(req.Type),
-		CommonSide: domain.Side(req.CommonSide),
-		From:       req.From,
-		To:         req.To,
-		MouseClick: domain.MouseClick(req.MouseClick),
-		IsJumping:  req.IsJumping,
-		IsRunning:  req.IsRunning,
-		IsWalking:  req.IsWalking,
-		IsPublic:   true,
-		CreatedBy:  req.CreatedBy,
+		Info: domain.Info{
+			Name:       req.Name,
+			Description: req.Desc,
+			MapID:      req.MapID,
+			Type:       domain.NadeType(req.Type),
+			CommonSide: domain.Side(req.CommonSide),
+			From:       req.From,
+			To:         req.To,
+			InputModifiers: domain.InputModifiers{
+				MouseClick: domain.MouseClick(req.MouseClick),
+				IsJumping:  req.IsJumping,
+				IsRunning:  req.IsRunning,
+				IsWalking:  req.IsWalking,
+			},
+		},
+		Metadata: domain.Metadata{
+			IsPublic:  true,
+			CreatedBy: req.CreatedBy,
+		},
 	}
 
 	id, err := h.repo.AddNade(r.Context(), nade)

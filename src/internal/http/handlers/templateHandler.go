@@ -83,20 +83,26 @@ func (tr *TemplateRenderer) AddNade(w http.ResponseWriter, r *http.Request) {
 	}
 	// map DTO -> domain
 	nade := domain.Nade{
-		Name:       r.FormValue("name"),
-		Desc:       r.FormValue("desc"),
-		MapID:      int16(mapid),
-		MapName:    mapData.DisplayName,
-		Type:       domain.NadeType(r.FormValue("type")),
-		CommonSide: domain.Side(r.FormValue("side")),
-		From:       r.FormValue("from"),
-		To:         r.FormValue("to"),
-		MouseClick: domain.MouseClick(r.FormValue("mouse_click")),
-		IsJumping:  r.FormValue("is_jumping") == "on",
-		IsRunning:  r.FormValue("is_running") == "on",
-		IsWalking:  r.FormValue("is_walking") == "on",
-		IsPublic:   true,
-		CreatedBy:  r.FormValue("created_by"),
+		Info: domain.Info{
+			Name:        r.FormValue("name"),
+			Description: r.FormValue("description"),
+			MapID:       int16(mapid),
+			MapName:     mapData.DisplayName,
+			Type:        domain.NadeType(r.FormValue("type")),
+			CommonSide:  domain.Side(r.FormValue("common_side")),
+			From:        r.FormValue("from"),
+			To:          r.FormValue("to"),
+			InputModifiers: domain.InputModifiers{
+				MouseClick: domain.MouseClick(r.FormValue("mouse_click")),
+				IsJumping:  r.FormValue("is_jumping") == "on",
+				IsRunning:  r.FormValue("is_running") == "on",
+				IsWalking:  r.FormValue("is_walking") == "on",
+			},
+		},
+		Metadata: domain.Metadata{
+			IsPublic:  true,
+			CreatedBy: r.FormValue("created_by"),
+		},
 	}
 
 	pubID, err := tr.repo.AddNade(r.Context(), nade)

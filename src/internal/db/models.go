@@ -5,6 +5,8 @@
 package nadevault
 
 import (
+	"github.com/Y-Figos/nadevault/internal/domain"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -17,23 +19,24 @@ type CsMap struct {
 }
 
 type Nade struct {
-	ID          int64
-	Name        string
-	Description string
-	PublicID    string
-	MapID       int16
-	NadeType    string
-	CommonSide  string
-	FromCallout string
-	ToCallout   string
-	MouseClick  string
-	IsJumping   bool
-	IsRunning   bool
-	IsWalking   bool
-	Images      []byte
-	IsPublic    bool
-	CreatedBy   pgtype.Text
-	CreatedAt   pgtype.Timestamptz
-	UpdatedAt   pgtype.Timestamptz
-	SearchTsv   interface{}
+	ID           int64
+	Name         string
+	Description  string
+	PublicID     uuid.UUID
+	MapID        int16
+	NadeType     domain.NadeType
+	CommonSide   domain.Side
+	FromCallout  string
+	ToCallout    string
+	MouseClick   domain.MouseClick
+	IsJumping    bool
+	IsRunning    bool
+	IsWalking    bool
+	Images       []byte
+	ImagesStatus domain.ImageStatus
+	IsPublic     bool
+	CreatedBy    pgtype.Text
+	CreatedAt    pgtype.Timestamptz
+	UpdatedAt    pgtype.Timestamptz
+	SearchTsv    interface{}
 }

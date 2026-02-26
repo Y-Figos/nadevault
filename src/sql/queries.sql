@@ -1,33 +1,7 @@
--- name: GetMapByCode :one
-SELECT
-id,
-code,
-display_name,
-is_active,
-created_at
-FROM cs_maps
-WHERE code = $1;
-
 -- name: GetNade :one
 SELECT
-nades.id,
-cs_maps.display_name AS map_display_name,
-name,
-description,
-map_id,
-nade_type,
-common_side,
-from_callout,
-to_callout,
-mouse_click,
-is_jumping,
-is_running,
-is_walking,
-images,
-is_public,
-created_by,
-nades.created_at,
-updated_at
+sqlc.embed(nades),
+sqlc.embed(cs_maps)
 FROM nades
 JOIN cs_maps ON nades.map_id = cs_maps.id
 WHERE nades.id = $1;
@@ -48,89 +22,59 @@ INSERT INTO nades (
     is_public,
     created_by
 ) VALUES (
-    $1,
-    $2,
-    $3,
-    $4,
-    $5,
-    $6,
-    $7,
-    $8,
-    $9,
-    $10,
-    $11,
-    $12,
-    $13
+    sqlc.arg('name'),
+    sqlc.arg('description'),
+    sqlc.arg('map_id'),
+    sqlc.arg('nade_type'),
+    sqlc.arg('common_side'),
+    sqlc.arg('from_callout'),
+    sqlc.arg('to_callout'),
+    sqlc.arg('mouse_click'),
+    sqlc.arg('is_jumping'),
+    sqlc.arg('is_running'),
+    sqlc.arg('is_walking'),
+    sqlc.arg('is_public'),
+    sqlc.arg('created_by')
 ) RETURNING id, public_id;
 
 -- name: ListNadesByMapID :many
 SELECT
-nades.id,
-cs_maps.display_name AS map_display_name,
-name,
-description,
-map_id,
-nade_type,
-common_side,
-from_callout,
-to_callout,
-mouse_click,
-is_jumping,
-is_running,
-is_walking,
-images,
-is_public,
-created_by,
-nades.created_at,
-updated_at
+    sqlc.embed(nades),
+    sqlc.embed(cs_maps)
 FROM nades
 JOIN cs_maps ON nades.map_id = cs_maps.id
-WHERE map_id = $1
+WHERE nades.map_id = sqlc.arg('map_id')
+  AND (
+    sqlc.arg('query')::text = '' 
+    OR nades.search_tsv @@ plainto_tsquery('simple', sqlc.arg('query'))
+  )
 ORDER BY nades.created_at DESC
-LIMIT $2 OFFSET $3;
+LIMIT sqlc.arg('limit') OFFSET sqlc.arg('offset');
 
 -- name: GetNadeByPublicID :one
 SELECT
-nades.public_id,
-cs_maps.display_name AS map_display_name,
-name,
-description,
-map_id,
-nade_type,
-common_side,
-from_callout,
-to_callout,
-mouse_click,
-is_jumping,
-is_running,
-is_walking,
-images,
-is_public,
-created_by,
-nades.created_at,
-updated_at
+sqlc.embed(nades),
+sqlc.embed(cs_maps)
 FROM nades
 JOIN cs_maps ON nades.map_id = cs_maps.id
 WHERE nades.public_id = $1;
 
 -- name: GetMaps :many
 SELECT
-id,
-code,
-display_name,
-is_active,
-created_at
+sqlc.embed(cs_maps)
 FROM cs_maps
 WHERE is_active = true
 ORDER BY display_name;
 
 -- name: GetMapByID :one
 SELECT
-id,
-code,
-display_name,
-is_active,
-created_at
+sqlc.embed(cs_maps)
 FROM cs_maps
 WHERE is_active = true
 AND id = $1;
+
+-- name: GetMapByCode :one
+SELECT
+sqlc.embed(cs_maps)
+FROM cs_maps
+WHERE code = $1;

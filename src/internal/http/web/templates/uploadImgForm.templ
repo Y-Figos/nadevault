@@ -12,23 +12,23 @@ templ UploadForm(nade domain.Nade, publicID string) {
                 <div class="stack">
                     <div class="row">
                         <label>Name</label>
-                        <span>{nade.Name}</span>
+                        <span>{nade.Info.Name}</span>
                     </div>
                     <div class="row">
                         <label>Description</label>
-                        <span>{nade.Desc}</span>
+                        <span>{nade.Info.Description}</span>
                     </div>
                     <div class="row">
                         <label>Map</label>
-                        <span>{nade.MapName}</span>
+                        <span>{nade.Info.MapName}</span>
                     </div>
                     <div class="row">
                         <label>Type</label>
-                        <span>{nade.Type}</span>
+                        <span>{nade.Info.Type}</span>
                     </div>
                     <div class="row">
                         <label>Common Side</label>
-                        <span>{nade.CommonSide}</span>
+                        <span>{nade.Info.CommonSide}</span>
                     </div>
                 </div>
             </div>

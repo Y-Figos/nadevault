@@ -11,6 +11,7 @@ import (
 
 	"github.com/Y-Figos/nadevault/internal/domain"
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -21,7 +22,7 @@ type fakeRepo struct {
 	getMapByCodeFn      func(ctx context.Context, code string) (*domain.CsMap, error)
 	getMapByIDFn        func(ctx context.Context, ID int16) (*domain.CsMap, error)
 	addNadeFn           func(ctx context.Context, nade domain.Nade) (string, error)
-	getnadeByPublicIDFn func(ctx context.Context, publicID string) (*domain.Nade, error)
+	getnadeByPublicIDFn func(ctx context.Context, publicID uuid.UUID) (*domain.Nade, error)
 }
 
 func (f fakeRepo) GetNadeByID(ctx context.Context, id int64) (*domain.Nade, error) {
@@ -40,7 +41,7 @@ func (f fakeRepo) AddNade(ctx context.Context, nade domain.Nade) (string, error)
 	return f.addNadeFn(ctx, nade)
 }
 
-func (f fakeRepo) GetNadeByPublicID(ctx context.Context, publicID string) (*domain.Nade, error) {
+func (f fakeRepo) GetNadeByPublicID(ctx context.Context, publicID uuid.UUID) (*domain.Nade, error) {
 	return f.getnadeByPublicIDFn(ctx, publicID)
 }
 func (f fakeRepo) GetMapList(ctx context.Context) ([]domain.CsMap, error) {
@@ -124,7 +125,7 @@ func TestGetNadeByID(t *testing.T) {
 	t.Run("success returns 200 and nade json", func(t *testing.T) {
 		h := NewNadeHandler(fakeRepo{
 			getNadeByIDFn: func(ctx context.Context, id int64) (*domain.Nade, error) {
-				return &domain.Nade{ID: id, Name: "test"}, nil
+				return &domain.Nade{ID: id, Info: domain.Info{Name: "test"}}, nil
 			},
 		})
 		req := httptest.NewRequest(http.MethodGet, "/api/nades/123", nil)
@@ -258,17 +259,17 @@ func TestAddNades(t *testing.T) {
 				called = true
 
 				// checa só o essencial (contrato DTO -> domain)
-				if nade.Name != "Mirage Window Smoke" {
-					t.Fatalf("expected name %q got %q", "Mirage Window Smoke", nade.Name)
+				if nade.Info.Name != "Mirage Window Smoke" {
+					t.Fatalf("expected name %q got %q", "Mirage Window Smoke", nade.Info.Name)
 				}
-				if nade.MapID != 1 {
-					t.Fatalf("expected map_id %d got %d", 1, nade.MapID)
+				if nade.Info.MapID != 1 {
+					t.Fatalf("expected map_id %d got %d", 1, nade.Info.MapID)
 				}
-				if string(nade.CommonSide) != "T" {
-					t.Fatalf("expected common_side %q got %q", "T", nade.CommonSide)
+				if string(nade.Info.CommonSide) != "T" {
+					t.Fatalf("expected common_side %q got %q", "T", nade.Info.CommonSide)
 				}
-				if string(nade.Type) != "smoke" {
-					t.Fatalf("expected type %q got %q", "smoke", nade.Type)
+				if string(nade.Info.Type) != "smoke" {
+					t.Fatalf("expected type %q got %q", "smoke", nade.Info.Type)
 				}
 
 				return "123", nil
@@ -383,8 +384,8 @@ func TestListNadesByMapID(t *testing.T) {
 			},
 			listNadesByMapIDFn: func(ctx context.Context, mapID int16, limit int32, offset int32) ([]domain.Nade, error) {
 				return []domain.Nade{
-					{ID: 1, Name: "A"},
-					{ID: 2, Name: "B"},
+					{ID: 1, Info: domain.Info{Name: "A"}},
+					{ID: 2, Info: domain.Info{Name: "B"}},
 				}, nil
 			},
 		})
