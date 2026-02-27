@@ -21,7 +21,7 @@ Minio and Redis are used as a way to reduce load from the main API.
 
 Images are first uploaded to Minio with pre-signed PUTs. A job is sent to the Redis stream and a Go worker is responsible for the conversion to WebP and saving it in the public bucket, reducing load times on the frontend and storage space/cost.
 
-## Roadmap v1
+## Roadmap v0.1
 - [x] Basic Nadevault API
 - [ ] Structured Logging
 - [ ] Minio Upload Cycle
