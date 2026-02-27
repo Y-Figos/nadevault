@@ -102,7 +102,6 @@ func (h *NadeHandler) AddNade(w http.ResponseWriter, r *http.Request) {
 		response.WriteAppError(w, err)
 		return
 	}
-
 	// map DTO -> domain
 	nade := domain.Nade{
 		Info: domain.Info{

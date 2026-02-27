@@ -29,7 +29,7 @@ func Layout() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>NadeVault</title><script src=\"https://unpkg.com/htmx.org@1.9.12\"></script><script src=\"/static/js/uploader.js\"></script><link rel=\"stylesheet\" href=\"/static/css/style.css\"></head><body><div class=\"topbar\"><div class=\"topbar-inner\"><a href=\"/\" class=\"brand\">NadeVault <span class=\"badge\">alpha</span></a><div class=\"row\"><a href=\"/admin/nades\" class=\"btn btn-primary\">Admin</a></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>NadeVault</title><script src=\"https://unpkg.com/htmx.org@1.9.12\"></script><script src=\"/static/js/uploader.js?v=0.0.1\"></script><link rel=\"stylesheet\" href=\"/static/css/style.css\"></head><body><div class=\"topbar\"><div class=\"topbar-inner\"><a href=\"/\" class=\"brand\">NadeVault <span class=\"badge\">alpha</span></a><div class=\"row\"><a href=\"/admin/nades\" class=\"btn btn-primary\">Admin</a></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

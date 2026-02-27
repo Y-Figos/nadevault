@@ -123,7 +123,7 @@ func UploadForm(nade domain.Nade, publicID string) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</span></div></div></div></div><div class=\"card\"><div class=\"card-header\"><div class=\"card-title\">Upload Images</div></div><div class=\"card-body\"></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</span></div></div></div></div><div class=\"card\"><div class=\"card-header\"><div class=\"card-title\">Upload Images</div></div><div class=\"card-body\"><label>AimAt</label> <input type=\"file\" class=\"imageUpload\" name=\"imageUploadAimAt\" multiple></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

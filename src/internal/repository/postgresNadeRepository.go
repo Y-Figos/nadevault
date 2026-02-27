@@ -26,8 +26,8 @@ func NewPostgresNadeRepository(q *nadevault.Queries) *PostgresNadeRepository {
 // NADE RELATED
 func mapToDomainNade(nade nadevault.NadeProvider) (*domain.Nade, error) {
 	modelNade, ModelMap := nade.GetNadeParam()
-	var img *domain.NadeImages
-	err := json.Unmarshal(modelNade.Images, img)
+	var img domain.NadeImages
+	err := json.Unmarshal(modelNade.Images, &img)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func mapToDomainNade(nade nadevault.NadeProvider) (*domain.Nade, error) {
 				IsWalking:  modelNade.IsWalking,
 			},
 		},
-		Images: *img,
+		Images: img,
 		Metadata: domain.Metadata{
 			ImageStatus: modelNade.ImagesStatus,
 			CreatedBy:   modelNade.CreatedBy.String,
@@ -152,6 +152,7 @@ func (r *PostgresNadeRepository) AddNade(ctx context.Context, nade domain.Nade) 
 	if err != nil {
 		return "", err
 	}
+	log.Printf("Adding nade with params: %+v", nadeParams)
 	id, err := r.q.AddNade(ctx, *nadeParams)
 	if err != nil {
 		var pgErr *pgconn.PgError

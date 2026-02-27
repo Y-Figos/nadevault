@@ -12,7 +12,7 @@ type CreateNadeRequest struct {
 	Desc       string            `json:"desc"`
 	MapID      int16             `json:"map_id"`
 	Type       string            `json:"type"`
-	CommonSide string            `json:"common_side"`
+	CommonSide string            `json:"side"`
 	From       string            `json:"from"`
 	To         string            `json:"to"`
 	MouseClick string            `json:"mouse_click"`
